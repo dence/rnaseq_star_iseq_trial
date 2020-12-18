@@ -1,0 +1,50 @@
+# path or URL to sample sheet (TSV format, columns: sample, condition, ...)
+samples: samples.tsv
+# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2,
+# strandedness). Units are technical replicates (e.g. lanes, or resequencing of the
+# same biological sample).If the column "strandedness" is present (which is optional),
+# can be empty or has one of these values: none, yes or reverse. none is for unstranded
+# protocols, yes an reverse follow the nomenclature used in `htseq-count --reverse`
+# which is referenced in STAR manual section 7, "Counting number of reads per gene".
+
+units: units.tsv
+
+trimming:
+  # skip trimming: false or true
+  skip: true
+  # the sequencing adapter
+  adapter: ACGGATCGATCGATCGATCGAT
+
+ref:
+  # the STAR index
+  index:
+    "Miami_of_Ohio": "/home/d.ence/d.ence_peter_share/pinus_taeda_L/reanalysis_old_RNAseq/rna-seq-star-deseq2/star_indices/t3352.cdna.v1.contig"
+    "PacBio": "/home/d.ence/d.ence_peter_share/pinus_taeda_L/reanalysis_old_RNAseq/rna-seq-star-deseq2/star_indices/PacBio"
+    "Clustered": "/home/d.ence/d.ence_peter_share/pinus_taeda_L/reanalysis_old_RNAseq/rna-seq-star-deseq2/star_indices/clustered_longer_than_500.est_0.99"
+    "v2.01_annnotations": "/home/d.ence/d.ence_peter_share/pinus_taeda_L/reanalysis_old_RNAseq/rna-seq-star-deseq2/star_indices/v2.01_genome_annots_index"
+  # gtf file with transcripts
+  #annotation: "path/to/annotation.gtf"
+
+pca:
+  labels:
+    # columns of sample sheet to use for PCA
+    - tissue
+    - treatment
+
+diffexp:
+  # contrasts for the deseq2 results method
+  contrasts:
+    treated-vs-untreated:
+      - MeJAtreated
+      - MeJAcontrol
+    cambium-vs-stem:
+      - cambium
+      - stem
+
+#got the options for aligning EndToEnd from github from the STAR developers
+#https://github.com/alexdobin/STAR/issues/123
+params:
+  #star: "--alignEndsType EndToEnd --alignIntronMax 1 --alignIntronMin 2 --scoreDelOpen -10000 --scoreInsOpen -10000 --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 0 --outFilterMismatchNmax 2 "
+  star: "--alignEndsType EndToEnd --alignIntronMax 1 --alignIntronMin 2 --scoreDelOpen -10000 --scoreInsOpen -10000 --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0 --outFilterMatchNmin 0 "
+  cutadapt-se: ""
+  cutadapt-pe: ""
