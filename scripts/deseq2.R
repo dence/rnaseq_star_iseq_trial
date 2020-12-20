@@ -1,20 +1,31 @@
-log <- file(snakemake@log[[1]], open="wt")
+#modification for working in hipergator cluster environment
+#Daniel Ence
+#December 20, 2020
+args=commandArgs(trailingOnly=TRUE)
+rds_file=args[1]
+out_table=args[2]
+ma_plot=args[3]
+log_file=args[4]
+threads=args[5]
+curr_contrast=args[6:7]
+
+log <- file(log_file, open="wt")
 sink(log)
 sink(log, type="message")
 
 library("DESeq2")
 
 parallel <- FALSE
-if (snakemake@threads > 1) {
+if (threads > 1) {
     library("BiocParallel")
     # setup parallelization
-    register(MulticoreParam(snakemake@threads))
+    register(MulticoreParam(threads))
     parallel <- TRUE
 }
 
-dds <- readRDS(snakemake@input[[1]])
+dds <- readRDS(rds_file)
 
-contrast <- c("condition", snakemake@params[["contrast"]])
+contrast <- c("condition", curr_contrast)
 res <- results(dds, contrast=contrast, parallel=parallel)
 # shrink fold changes for lowly expressed genes
 res <- lfcShrink(dds, contrast=contrast, res=res)
@@ -24,8 +35,8 @@ res <- res[order(res$padj),]
 
 
 # store results
-svg(snakemake@output[["ma_plot"]])
+svg(ma_plot)
 plotMA(res, ylim=c(-2,2))
 dev.off()
 
-write.table(as.data.frame(res), file=snakemake@output[["table"]])
+write.table(as.data.frame(res), file=out_table)

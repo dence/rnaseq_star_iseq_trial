@@ -22,9 +22,11 @@ properties:
     type: object
     properties:
       index:
-        type: string
-      annotation:
-        type: string
+          type: string
+      #index:
+      #  type: object
+      #annotation:
+      #  type: string
     required:
       - index
       #- annotation

@@ -15,6 +15,7 @@ sink(log)
 sink(log, type="message")
 
 library("DESeq2")
+library("tidyverse")
 
 parallel <- FALSE
 if (threads > 1) {
@@ -27,7 +28,18 @@ if (threads > 1) {
 # colData and countData must have the same sample order, but this is ensured
 # by the way we create the count matrix
 cts <- read.table(counts_file, header=TRUE, row.names="gene", check.names=FALSE)
+
+#need to sort cts columns
+cts <- cts[ , order(names(cts))]
+
 coldata <- read.table(sample_file, header=TRUE, row.names="sample", check.names=FALSE)
+
+#need to sort coldata by value of "sample" columns
+row.names(coldata) -> coldata$tmp_sample_names
+coldata <- arrange(coldata, tmp_sample_names) %>% select(-tmp_sample_names)
+
+
+
 
 dds <- DESeqDataSetFromMatrix(countData=cts,
                               colData=coldata,
